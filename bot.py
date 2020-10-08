@@ -51,7 +51,7 @@ def resposta1(update, context):
 
 
 def resposta2(update, context):
-    #feedback = update.message.text
+    resposta = update.message.text
     message = "Muito obrigada pela visita!"
     context.bot.send_message(chat_id=update.effective_chat.id, text=message)
     return ConversationHandler.END
