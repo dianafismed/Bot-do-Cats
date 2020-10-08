@@ -24,8 +24,8 @@ def resposta(update, context):
         # envia a mesagem para o usuario e guarda a resposta dele 
         update.message.reply_text(message, reply_markup=ReplyKeyboardMarkup([], one_time_keyboard=True)) 
         return STATE1
-    except Exception as e:
-        print(str(e))
+    except Exception as error:
+        print(str(error))
 
 
 def resposta1(update, context):
@@ -78,15 +78,11 @@ def main():
             # caso o usuário desista da conversa
             fallbacks=[CommandHandler('cancel', cancel)])
         updater.dispatcher.add_handler(conversation_handler)
-
-        updater.dispatcher.add_handler(CommandHandler('nota', askForNota))
-        updater.dispatcher.add_handler(CallbackQueryHandler(getNota))
-
         print("Updater no ar: " + str(updater))
         updater.start_polling()
         updater.idle()
-    except Exception as e:
-        print(str(e))
+    except Exception as error:
+        print(str(error))
 
 if __name__ == "__main__":
     main()
