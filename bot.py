@@ -1,4 +1,4 @@
-import requests
+import requests, emoji
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler, ConversationHandler, CallbackQueryHandler)
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 
@@ -7,13 +7,13 @@ ADOPT  = 1
 GENDER = 2
 INFO   = 3
 TIP    = 4
-
+HI     = 5 
 
 '''------------------------------------------------------------------------------------------
                                            LIBRARIES
 ------------------------------------------------------------------------------------------'''
 yes = {'sim', 'claro', 'certeza', 'vamos', 'quero', 'obvio', 'óbvio', 'tá', 'ta', 'ok', 'yep'}
-no  = {'nao', 'não', 'apenas', 'já', 'saber', 'sobre', 'nope', 'no'}
+no  = {'nao', 'não', 'apenas', 'já', 'saber', 'sobre', 'nope', 'no', 'NAO', 'NÃO', 'Não'}
 op_1 = {'1', 'cuidados', 'cuidado', 'cuidar', 'cuida', 'cuido'}
 op_2 = {'2', 'alimentacao', 'alimentação', 'alimento', 'ração', 'racao', 'comida', 'come'}
 op_3 = {'3', 'castração', 'castracao', 'castrar', 'castrado', 'castro'}
@@ -29,13 +29,24 @@ female_gender = {'femea', 'fêmea', 'menina', 'gata', 'mulher', 'gatinha', 'feme
 def hello(update, context):
     try:
         user_name = update.message.from_user.first_name
-        message = '😺   Olá, ' + user_name + '!  😺\nVocê quer adotar um gatinho?  😻'
+        message = '😺   Olá, ' + user_name + '! 😻'
+        context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+        return HI
+    except Exception as error:
+        print(error)
+
+
+# (HI) 
+def hi(update, context):
+    try:
+        message = '😻 Você quer adotar um gatinho?  😻'
         context.bot.send_message(chat_id=update.effective_chat.id, text=message)
         return SAFE
     except Exception as error:
         print(error)
 
-# (SAFE)  ASKING ABOUT SAFETY
+
+# (SAFE)  ASKING ABOUT HOUSE SAFETY
 def safety(update, context):
     try:
         answer = set(str(update.message.text).lower().split(' '))
@@ -50,7 +61,7 @@ def safety(update, context):
         else:
             message = "Não entendi. Poderia repetir, por favor?"
             context.bot.send_message(chat_id=update.effective_chat.id, text=message)
-            return ADOPT
+            return SAFE
     except Exception as error:
         print(error)
 
@@ -68,14 +79,14 @@ def adoption_question(update, context):
             context.bot.send_message(chat_id=update.effective_chat.id, text=message)
             return INFO
         else:
-            message = "Não entendi. Poderia repetir, por favor?"
+            message = "Não entendi. Você quer um macho ou uma fêmea?"
             context.bot.send_message(chat_id=update.effective_chat.id, text=message)
             return ADOPT
     except Exception as error:
         print(error)
     
 
-# CHOSING THE GENDER
+# (GENDER) CHOSING CAT GENDER
 def gender(update, context):
     try:
         answer = set(str(update.message.text).lower().split(' '))
@@ -117,8 +128,9 @@ def info(update, context):
 
 
 #CARE TIPS
-def tip(update, context):
+def tip(update, context):   
     try:
+        user_name = update.message.from_user.first_name
         answer = set(str(update.message.text).lower().split(' '))
         if answer.intersection(op_1):
             message = care()       
@@ -139,7 +151,7 @@ def tip(update, context):
         else:
             message = "Não entendi. Poderia repetir, por favor?"
             context.bot.send_message(chat_id=update.effective_chat.id, text=message)
-            return INFO
+            return TIP
     except Exception as error:
         print(error)
 
@@ -169,7 +181,7 @@ def care():
     Saúde - Leve seu bebê pelo menos 1 vez ao ano no veterinário para as vacinações e um check-up..
     Castração - Castre sempre!
 
-    E aí, gostou?? Quer falar sobre outro tópico??'''
+    Quer falar sobre outro tópico??'''
     return message
 
 def feed():
@@ -183,7 +195,7 @@ def feed():
     - entre outras.
     Adeque a ração de acordo com a situação de seu bebê.
 
-    E aí, gostou?? Quer falar sobre outro tópico??'''
+    Quer falar sobre outro tópico??'''
     return message
 
 def castration():
@@ -194,7 +206,7 @@ def castration():
     Machos também tem cio, e costumam urinar bastante nesse período de forma a marcar território.
     Se quiser outros filhotinhos basta adotar outro, há muitos por aí precisando de amor
     
-    E aí, gostou?? Quer falar sobre outro tópico??'''
+    Quer falar sobre outro tópico??'''
     return message
 
 def vacination():
@@ -207,7 +219,7 @@ def vacination():
     - e, no caso da V5, leucemia felina(FeLV)
     Além, é claro, de vacinar contra raiva e vermifugar. 
     
-    E aí, gostou?? Quer falar sobre outro tópico??'''
+    Quer falar sobre outro tópico??'''
     return message
 
 
@@ -225,6 +237,7 @@ def main():
         conversation_handler = ConversationHandler(
             entry_points=[CommandHandler('start', hello)],
             states={
+                HI:     [MessageHandler(Filters.text, hi)],
                 SAFE:   [MessageHandler(Filters.text, safety)],
                 ADOPT:  [MessageHandler(Filters.text, adoption_question)],
                 GENDER: [MessageHandler(Filters.text, gender)],
